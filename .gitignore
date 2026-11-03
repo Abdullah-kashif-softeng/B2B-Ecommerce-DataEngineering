@@ -1,0 +1,35 @@
+# =============================================================
+# Dot Folders
+# =============================================================
+
+# Antigravity / AI agent workspace
+.agents/
+
+# AI Dev Kit workspace
+.ai-dev-kit/
+
+# Claude AI workspace
+.claude/
+
+# Cursor IDE settings
+.cursor/
+
+# Databricks CLI local config & state
+.databricks/
+
+# Python virtual environment (inside data/)
+data/.venv/
+
+.github/skills
+
+ data_generation/__pycache__
+
+  __pycache__/ 
+
+*.pyc  
+# NOTE: .git/ is managed by Git itself — never ignore it.
+# NOTE: .github/ contains CI/CD workflows — intentionally tracked.
+
+
+__pycache__/
+*.pyc
