@@ -1,0 +1,21 @@
+services:
+  scheduler:
+    volumes:
+      # tasks run in the scheduler container: generator scripts (read-only) and the data/output folder they write to
+      - ../data_generation:/usr/local/airflow/data_generation:ro
+      - ../data/output:/usr/local/airflow/data/output
+
+  postgres_db:                      # source B2B Postgres (service taken from the old docker-compose.yml)
+    image: postgres:13
+    container_name: postgres_db
+    networks:
+      - airflow                     # same network as the Airflow containers
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - b2b_source_data:/var/lib/postgresql/data
+
+volumes:
+  b2b_source_data:

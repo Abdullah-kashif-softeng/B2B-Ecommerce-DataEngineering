@@ -20,7 +20,9 @@
 # Python virtual environment (inside data/)
 data/.venv/
 
+.env
 .github/skills
+skills-lock.json
 
  data_generation/__pycache__
 
