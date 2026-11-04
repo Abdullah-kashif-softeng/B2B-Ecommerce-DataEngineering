@@ -161,6 +161,8 @@ def build_reference():
                     lead_time_days=rng.randint(2, 30), is_preferred=rng.random() < .3,
                     valid_from=p["created_at"].date(), created_at=p["created_at"], updated_at=p["created_at"])
                for s in p["supplier_ids"]]
+    for r in sp:  # a link can't exist before its product or its supplier company
+        r["created_at"] = r["updated_at"] = max(r["created_at"], companies[r["supplier_id"] - 1]["created_at"])
     suppliers = [dict(supplier_id=c["company_id"], company_id=c["company_id"], lead_time_days=rng.randint(2, 30),
                       contact_name=f"{rng.choice(FIRST)} {rng.choice(LAST)}", contact_email=f"sales@{c['domain']}.com",
                       min_order_value=rng.choice([0, 500, 1000, 2500]), is_preferred=rng.random() < .3,
@@ -258,6 +260,7 @@ def build_orders(day):
     orders, brng = [], random.Random(f"{SEED}-bad-{day}")
     urng = random.Random(f"{SEED}-upd-{day}")  # separate stream: adding updated_at changes no existing value
     for i, (ts, co) in enumerate(zip(stamps, cos), 1):
+        ts = max(ts, co["created_at"])  # an order can't exist before its buyer company (customers share its created_at)
         oid = int(f"{day:%Y%m%d}") * 1000 + i
         custs = ref["customers_by_company"][co["company_id"]]
         cust = custs[0] if co["company_id"] in once_ids else rng.choices(custs, [4] + [1] * (len(custs) - 1))[0]  # first customer = primary buyer, places most orders
@@ -267,7 +270,7 @@ def build_orders(day):
             status = "delivered"
         else:
             status = rng.choice(["pending", "confirmed", "shipped", "delivered"][:min(age, 3) + 1])
-        upd = ts if status == "pending" else min(ts + timedelta(hours=urng.randint(1, 72)), utc_now())  # last change of the order
+        upd = ts if status == "pending" else max(ts, min(ts + timedelta(hours=urng.randint(1, 72)), utc_now()))  # last change of the order, never before created_at
         picks = {p["product_id"]: p for p in rng.choices(
             ref["products"], ref["product_w"], k=rng.choices([1, 2, 3, 4, 5, 6], [25, 25, 20, 15, 10, 5])[0])}
         items = []

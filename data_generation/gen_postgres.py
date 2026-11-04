@@ -37,6 +37,24 @@ CREATE TABLE IF NOT EXISTS order_items (order_item_id BIGINT PRIMARY KEY, order_
     line_total NUMERIC(12,2), warehouse TEXT, created_at TIMESTAMP, updated_at TIMESTAMP);
 """
 
+# DB-side guard for CDC: created_at is immutable, and any UPDATE that forgets to move updated_at still moves it.
+TRIGGERS = """
+CREATE OR REPLACE FUNCTION touch_row() RETURNS trigger AS $$
+BEGIN
+  NEW.created_at := OLD.created_at;
+  IF NEW.updated_at IS NOT DISTINCT FROM OLD.updated_at THEN
+    NEW.updated_at := clock_timestamp() AT TIME ZONE 'UTC';
+  END IF;
+  RETURN NEW;
+END $$ LANGUAGE plpgsql;
+DO $$ DECLARE t text; BEGIN
+  FOREACH t IN ARRAY ARRAY['companies','products','suppliers','supplier_products','customers','orders','order_items'] LOOP
+    EXECUTE format('DROP TRIGGER IF EXISTS trg_touch ON %I', t);
+    EXECUTE format('CREATE TRIGGER trg_touch BEFORE UPDATE ON %I FOR EACH ROW EXECUTE FUNCTION touch_row()', t);
+  END LOOP;
+END $$;
+"""
+
 # core KPI columns first, then the "realism" extras
 COLS = {
     "companies": "company_id name cuit company_type country city rating | address phone contact_email industry employee_count payment_terms is_active created_at updated_at",
@@ -48,11 +66,36 @@ COLS = {
     "order_items": "order_item_id order_id product_id supplier_id quantity unit_price | line_number discount_pct tax_rate line_total warehouse created_at updated_at",
 }
 
+# orders and their items change together, so both move updated_at (CDC sees the items too)
 ADVANCE_OPEN_ORDERS = """
-UPDATE orders SET updated_at = %s,
-  status = CASE status WHEN 'pending' THEN 'confirmed' WHEN 'confirmed' THEN 'shipped' ELSE 'delivered' END
-WHERE order_id IN (SELECT order_id FROM orders WHERE status IN ('pending','confirmed','shipped')
-                   ORDER BY random() LIMIT 40);
+WITH advanced AS (
+  UPDATE orders SET updated_at = %(now)s,
+    status = CASE status WHEN 'pending' THEN 'confirmed' WHEN 'confirmed' THEN 'shipped' ELSE 'delivered' END
+  WHERE order_id IN (SELECT order_id FROM orders WHERE status IN ('pending','confirmed','shipped')
+                     ORDER BY random() LIMIT 40)
+  RETURNING order_id)
+UPDATE order_items SET updated_at = %(now)s WHERE order_id IN (SELECT order_id FROM advanced);
+"""
+
+# the 5 reference tables also change over time (non-KPI columns, value always differs), so their updated_at moves too
+UPDATE_DIMENSIONS = """
+UPDATE companies SET updated_at = %(now)s,
+  payment_terms = CASE payment_terms WHEN 'Net 15' THEN 'Net 30' WHEN 'Net 30' THEN 'Net 45' WHEN 'Net 45' THEN 'Prepaid' ELSE 'Net 15' END
+ WHERE company_id IN (SELECT company_id FROM companies ORDER BY random() LIMIT 5);
+UPDATE products SET updated_at = %(now)s,
+  min_order_qty = CASE min_order_qty WHEN 1 THEN 5 WHEN 5 THEN 10 ELSE 1 END
+ WHERE product_id IN (SELECT product_id FROM products ORDER BY random() LIMIT 5);
+UPDATE suppliers SET updated_at = %(now)s,
+  min_order_value = CASE min_order_value WHEN 0 THEN 500 WHEN 500 THEN 1000 WHEN 1000 THEN 2500 ELSE 0 END
+ WHERE supplier_id IN (SELECT supplier_id FROM suppliers ORDER BY random() LIMIT 2);
+UPDATE supplier_products SET updated_at = %(now)s,
+  lead_time_days = CASE WHEN lead_time_days >= 30 THEN 2 ELSE lead_time_days + 1 END
+ WHERE (supplier_id, product_id) IN (SELECT supplier_id, product_id FROM supplier_products ORDER BY random() LIMIT 5);
+UPDATE customers SET updated_at = %(now)s,
+  job_title = CASE job_title WHEN 'Purchasing Manager' THEN 'Procurement Analyst' WHEN 'Procurement Analyst' THEN 'Operations Director'
+              WHEN 'Operations Director' THEN 'Office Manager' WHEN 'Office Manager' THEN 'CEO' WHEN 'CEO' THEN 'Logistics Coordinator'
+              ELSE 'Purchasing Manager' END
+ WHERE customer_id IN (SELECT customer_id FROM customers ORDER BY random() LIMIT 5);
 """
 
 
@@ -67,6 +110,7 @@ mode, days = days_from_cli()
 ref = build_reference()
 with psycopg2.connect(DSN) as conn, conn.cursor() as cur:
     cur.execute(DDL)
+    cur.execute(TRIGGERS)
     for t in ["companies", "products", "suppliers", "supplier_products", "customers"]:
         insert(cur, t, ref[t])
     n_orders, bad = 0, (list(ref["bad"]) if mode == "backfill" else [])
@@ -77,7 +121,9 @@ with psycopg2.connect(DSN) as conn, conn.cursor() as cur:
         n_orders += len(orders)
         bad += [b for o in orders for b in o["bad"]]
     if mode == "daily":
-        cur.execute(ADVANCE_OPEN_ORDERS, (utc_now(),))  # status change -> updated_at moves (this is what CDC picks up)
+        now = utc_now()  # one timestamp for the whole run
+        cur.execute(ADVANCE_OPEN_ORDERS, {"now": now})  # status change -> updated_at moves (this is what CDC picks up)
+        cur.execute(UPDATE_DIMENSIONS, {"now": now})
 
 # manifest of every injected error = ground truth for checking your data-quality rules
 os.makedirs(OUT_DIR, exist_ok=True)
