@@ -2569,14 +2569,3 @@ orders,20261103028,status,inconsistent_format
 orders,20261103029,status,inconsistent_format
 orders,20261103033,expected_delivery_date,before_order_date
 order_items,202611030341,unit_price,missing
-orders,20261104002,order_date,missing
-order_items,202611040023,quantity,zero
-order_items,202611040033,unit_price,negative
-order_items,202611040052,quantity,negative
-orders,20261104011,order_date,future_date
-order_items,202611040113,unit_price,negative
-orders,20261104013,expected_delivery_date,before_order_date
-order_items,202611040181,quantity,zero
-orders,20261104026,status,inconsistent_format
-order_items,202611040281,quantity,zero
-orders,20261104032,status,inconsistent_format
