@@ -1,0 +1,9 @@
+# The weekly schedule for the raw_files_to_bronze_etl pipeline is NOT declared here.
+# It runs via the workspace job `raw_files_to_bronze_etl_weekly` (job_id 1000475873894472):
+# every Monday 00:00 UTC, single pipeline_task against the live pipeline
+# (1fec3db6-39c5-4482-a15b-634fdcfd4414). It was created directly with the Jobs API because
+# bundle deploys currently demand a destructive pipeline recreation (environment block change).
+# If a destructive deploy is ever accepted (--auto-approve), declare the schedule as a jobs
+# resource here instead and delete the manual job to avoid two schedules firing the same pipeline.
+
+resources: {}
