@@ -12,7 +12,7 @@ Automate & orchestrate the entire pipeline with monitoring and notifications
 
 Data Sources (Input Layer)
 
-Source 1: PostgreSQL: Operational B2B Database (read via Lakehouse Federation / JDBC)
+Source 1: PostgreSQL: Operational B2B Database (read via lakeflow connect)
 
 Companies (suppliers & buyers with locations, CUIT tax IDs, ratings)
 Orders & order items (products, quantities, prices, status)
