@@ -1,0 +1,227 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>B2B Ecommerce LDM</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one wide, scrollable diagram with every entity listing its attributes and keys, then a key above it and notes below. */
+:root {
+  --bg: #f7f8fa; --fg: #1c2330; --muted: #5b6678; --line: #6b7587; --rule: #dde1e8; --surface: #ffffff;
+  --c-parties: #0f766e; --c-sales: #2457c5; --c-catalog: #b45309; --c-leads: #a8326a; --c-web: #5b6b2f;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-head: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --fg: #e6e9ef; --muted: #98a2b3; --line: #8a94a6; --rule: #2a313c; --surface: #181d26;
+    --c-parties: #4fd1c5; --c-sales: #7aa2ff; --c-catalog: #f5b25c; --c-leads: #f08bbd; --c-web: #b5c96a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --fg: #e6e9ef; --muted: #98a2b3; --line: #8a94a6; --rule: #2a313c; --surface: #181d26;
+  --c-parties: #4fd1c5; --c-sales: #7aa2ff; --c-catalog: #f5b25c; --c-leads: #f08bbd; --c-web: #b5c96a;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-block: 32px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+h1 { font-family: var(--font-head); font-weight: 600; font-size: 1.9rem; line-height: 1.15; margin: 0 0 8px; text-wrap: balance; }
+h2 { font-family: var(--font-head); font-weight: 500; font-size: 1.1rem; margin: 0 0 8px; }
+p { margin: 0; max-width: 70ch; }
+.lede { color: var(--muted); }
+code { font-family: var(--font-mono); font-size: 12.5px; }
+.keys { display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--muted); }
+.group { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.group b { font-weight: 500; color: var(--fg); min-width: 96px; }
+.group span { display: inline-flex; align-items: center; gap: 7px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid; }
+.sw.parties { border-color: var(--c-parties); background: color-mix(in srgb, var(--c-parties) 18%, transparent); }
+.sw.sales { border-color: var(--c-sales); background: color-mix(in srgb, var(--c-sales) 18%, transparent); }
+.sw.catalog { border-color: var(--c-catalog); background: color-mix(in srgb, var(--c-catalog) 18%, transparent); }
+.sw.leads { border-color: var(--c-leads); background: color-mix(in srgb, var(--c-leads) 18%, transparent); }
+.sw.web { border-color: var(--c-web); background: color-mix(in srgb, var(--c-web) 18%, transparent); }
+.kt { font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: var(--fg); }
+svg.key { min-width: 0; width: 52px; height: 24px; color: var(--fg); }
+figure { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 12px; }
+svg.ldm { display: block; min-width: 1100px; width: 100%; height: auto; color: var(--fg); }
+figcaption { font-size: 13px; color: var(--muted); max-width: 84ch; }
+svg text { font-family: var(--font-body); fill: currentColor; stroke: none; }
+.body { fill: var(--surface); stroke-width: 1.6; }
+.head { stroke: none; fill-opacity: 0.2; }
+.div { stroke-width: 1; }
+.parties { fill: var(--c-parties); stroke: var(--c-parties); }
+.sales { fill: var(--c-sales); stroke: var(--c-sales); }
+.catalog { fill: var(--c-catalog); stroke: var(--c-catalog); }
+.leads { fill: var(--c-leads); stroke: var(--c-leads); }
+.web { fill: var(--c-web); stroke: var(--c-web); }
+.body.parties, .body.sales, .body.catalog, .body.leads, .body.web { fill: var(--surface); }
+.name { font-size: 13.5px; font-weight: 600; }
+.attr { font-size: 12px; }
+.attr.pk { font-weight: 600; }
+.tag { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-anchor: end; fill: var(--muted); }
+.ln { fill: none; stroke: var(--line); stroke-width: 1.3; }
+.ln.dash { stroke-dasharray: 5 3; }
+.mk { stroke: var(--line); stroke-width: 1.5; fill: none; }
+.ring { stroke: var(--line); stroke-width: 1.5; fill: var(--surface); }
+.verb { font-size: 12px; font-style: italic; }
+.mid { text-anchor: middle; }
+.notes { display: flex; flex-direction: column; gap: 8px; padding-left: 18px; margin: 0; max-width: 78ch; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>B2B Ecommerce logical data model</h1>
+    <p class="lede">Every entity in the <code>b2b_ecommerce</code> catalog with its attributes, keys and relationships. No data types, storage or database-specific detail.</p>
+  </header>
+
+  <div class="keys" aria-label="Notation key">
+    <div class="group"><b>Subject area</b>
+      <span><i class="sw parties"></i>Parties</span>
+      <span><i class="sw sales"></i>Sales</span>
+      <span><i class="sw catalog"></i>Products</span>
+      <span><i class="sw leads"></i>Marketing</span>
+      <span><i class="sw web"></i>Web traffic</span>
+    </div>
+    <div class="group"><b>Keys</b>
+      <span><span class="kt">PK</span>primary key</span>
+      <span><span class="kt">FK</span>foreign key</span>
+      <span><span class="kt">AK</span>alternate key, unique on its own (a pair of AK rows is unique together)</span>
+    </div>
+    <div class="group"><b>At each line end</b>
+      <span><svg class="key" viewBox="-2 0 52 24" width="52" height="24" aria-hidden="true"><line class="ln" x1="0" y1="12" x2="50" y2="12"/><line class="mk" x1="9.0" y1="6.0" x2="9.0" y2="18.0"/><line class="mk" x1="14.0" y1="6.0" x2="14.0" y2="18.0"/></svg>exactly one</span>
+      <span><svg class="key" viewBox="-2 0 52 24" width="52" height="24" aria-hidden="true"><line class="ln" x1="0" y1="12" x2="50" y2="12"/><line class="mk" x1="9.0" y1="6.0" x2="9.0" y2="18.0"/><circle class="ring" cx="17.0" cy="12.0" r="4.5"/></svg>zero or one</span>
+      <span><svg class="key" viewBox="-2 0 52 24" width="52" height="24" aria-hidden="true"><line class="ln" x1="0" y1="12" x2="50" y2="12"/><line class="mk" x1="12.0" y1="12.0" x2="0.0" y2="5.0"/><line class="mk" x1="12.0" y1="12.0" x2="0.0" y2="12.0"/><line class="mk" x1="12.0" y1="12.0" x2="0.0" y2="19.0"/><circle class="ring" cx="19.0" cy="12.0" r="4.5"/></svg>zero or many</span>
+      <span><svg class="key" viewBox="-2 0 52 24" width="52" height="24" aria-hidden="true"><line class="ln" x1="0" y1="12" x2="50" y2="12"/><line class="mk" x1="12.0" y1="12.0" x2="0.0" y2="5.0"/><line class="mk" x1="12.0" y1="12.0" x2="0.0" y2="12.0"/><line class="mk" x1="12.0" y1="12.0" x2="0.0" y2="19.0"/><line class="mk" x1="17.0" y1="6.0" x2="17.0" y2="18.0"/></svg>one or many</span>
+    </div>
+    <div class="group"><b>Line style</b>
+      <span><svg class="key" viewBox="-2 0 52 24" width="52" height="24" aria-hidden="true"><line class="ln" x1="0" y1="12" x2="50" y2="12"/></svg>foreign key</span>
+      <span><svg class="key" viewBox="-2 0 52 24" width="52" height="24" aria-hidden="true"><line class="ln dash" x1="0" y1="12" x2="50" y2="12"/></svg>derived from matching values, no key column</span>
+    </div>
+  </div>
+
+  <figure>
+    <div class="scroll">
+      <svg class="ldm" viewBox="0 0 1260 1090" role="img" aria-label="Logical data model with 13 entities, their attributes, primary keys (PK), foreign keys (FK) and alternate keys (AK). Company is the hub: it employs Customers, places Orders as buyer and can be a Supplier. A Lead is tied to a Company only by a derived match on company name. An Order contains Order Items, each for one Product and sourced from one Supplier. Supplier Product resolves the many-to-many link between Suppliers and Products. Web Sessions and Page Requests each reference an IP Address and, optionally, a Device. IP Address optionally references an IP Geo Reference. A Web Session and a Page Request each optionally reference a Customer, a Page Request through the auth_user email. A Web Session is derived from Page Requests, with no key between them.">
+        <path class="ln dash" d="M240.0,130.0 L350.0,130.0"/>
+        <line class="mk" x1="252.0" y1="130.0" x2="240.0" y2="123.0"/><line class="mk" x1="252.0" y1="130.0" x2="240.0" y2="130.0"/><line class="mk" x1="252.0" y1="130.0" x2="240.0" y2="137.0"/><circle class="ring" cx="259.0" cy="130.0" r="4.5"/>
+        <line class="mk" x1="341.0" y1="136.0" x2="341.0" y2="124.0"/><circle class="ring" cx="333.0" cy="130.0" r="4.5"/>
+        <text class="verb mid" x="295.0" y="124">is about</text>
+        <text class="verb mid" x="295.0" y="147">(by name)</text>
+        <path class="ln" d="M455.0,289.0 L455.0,360.0"/>
+        <line class="mk" x1="461.0" y1="298.0" x2="449.0" y2="298.0"/><line class="mk" x1="461.0" y1="303.0" x2="449.0" y2="303.0"/>
+        <line class="mk" x1="455.0" y1="348.0" x2="448.0" y2="360.0"/><line class="mk" x1="455.0" y1="348.0" x2="455.0" y2="360.0"/><line class="mk" x1="455.0" y1="348.0" x2="462.0" y2="360.0"/><circle class="ring" cx="455.0" cy="341.0" r="4.5"/>
+        <text class="verb" x="463.0" y="330">employs</text>
+        <path class="ln" d="M560.0,230.0 L775.0,230.0 L775.0,360.0"/>
+        <line class="mk" x1="569.0" y1="224.0" x2="569.0" y2="236.0"/><line class="mk" x1="574.0" y1="224.0" x2="574.0" y2="236.0"/>
+        <line class="mk" x1="775.0" y1="348.0" x2="768.0" y2="360.0"/><line class="mk" x1="775.0" y1="348.0" x2="775.0" y2="360.0"/><line class="mk" x1="775.0" y1="348.0" x2="782.0" y2="360.0"/><circle class="ring" cx="775.0" cy="341.0" r="4.5"/>
+        <text class="verb mid" x="667.5" y="224">places as buyer</text>
+        <path class="ln" d="M560.0,80.0 L670.0,80.0"/>
+        <line class="mk" x1="569.0" y1="74.0" x2="569.0" y2="86.0"/><line class="mk" x1="574.0" y1="74.0" x2="574.0" y2="86.0"/>
+        <line class="mk" x1="661.0" y1="86.0" x2="661.0" y2="74.0"/><circle class="ring" cx="653.0" cy="80.0" r="4.5"/>
+        <text class="verb mid" x="615.0" y="74">can be</text>
+        <path class="ln" d="M560.0,466.0 L670.0,466.0"/>
+        <line class="mk" x1="569.0" y1="460.0" x2="569.0" y2="472.0"/><line class="mk" x1="574.0" y1="460.0" x2="574.0" y2="472.0"/>
+        <line class="mk" x1="658.0" y1="466.0" x2="670.0" y2="473.0"/><line class="mk" x1="658.0" y1="466.0" x2="670.0" y2="466.0"/><line class="mk" x1="658.0" y1="466.0" x2="670.0" y2="459.0"/><circle class="ring" cx="651.0" cy="466.0" r="4.5"/>
+        <text class="verb mid" x="615.0" y="460">places</text>
+        <path class="ln" d="M775.0,588.0 L775.0,650.0"/>
+        <line class="mk" x1="781.0" y1="597.0" x2="769.0" y2="597.0"/><line class="mk" x1="781.0" y1="602.0" x2="769.0" y2="602.0"/>
+        <line class="mk" x1="775.0" y1="638.0" x2="768.0" y2="650.0"/><line class="mk" x1="775.0" y1="638.0" x2="775.0" y2="650.0"/><line class="mk" x1="775.0" y1="638.0" x2="782.0" y2="650.0"/><line class="mk" x1="769.0" y1="633.0" x2="781.0" y2="633.0"/>
+        <text class="verb" x="783.0" y="616">contains</text>
+        <path class="ln" d="M880.0,790.0 L1095.0,790.0 L1095.0,572.5"/>
+        <line class="mk" x1="892.0" y1="790.0" x2="880.0" y2="783.0"/><line class="mk" x1="892.0" y1="790.0" x2="880.0" y2="790.0"/><line class="mk" x1="892.0" y1="790.0" x2="880.0" y2="797.0"/><circle class="ring" cx="899.0" cy="790.0" r="4.5"/>
+        <line class="mk" x1="1101.0" y1="581.5" x2="1089.0" y2="581.5"/><line class="mk" x1="1101.0" y1="586.5" x2="1089.0" y2="586.5"/>
+        <text class="verb mid" x="987.5" y="784">is for</text>
+        <path class="ln" d="M880.0,700.0 L935.0,700.0 L935.0,130.0 L880.0,130.0"/>
+        <line class="mk" x1="892.0" y1="700.0" x2="880.0" y2="693.0"/><line class="mk" x1="892.0" y1="700.0" x2="880.0" y2="700.0"/><line class="mk" x1="892.0" y1="700.0" x2="880.0" y2="707.0"/><circle class="ring" cx="899.0" cy="700.0" r="4.5"/>
+        <line class="mk" x1="889.0" y1="124.0" x2="889.0" y2="136.0"/><line class="mk" x1="894.0" y1="124.0" x2="894.0" y2="136.0"/>
+        <text class="verb mid" x="927.0" y="415" transform="rotate(-90 927 415)">is sourced from</text>
+        <path class="ln" d="M880.0,80.0 L990.0,80.0"/>
+        <line class="mk" x1="889.0" y1="74.0" x2="889.0" y2="86.0"/><line class="mk" x1="894.0" y1="74.0" x2="894.0" y2="86.0"/>
+        <line class="mk" x1="978.0" y1="80.0" x2="990.0" y2="87.0"/><line class="mk" x1="978.0" y1="80.0" x2="990.0" y2="80.0"/><line class="mk" x1="978.0" y1="80.0" x2="990.0" y2="73.0"/><circle class="ring" cx="971.0" cy="80.0" r="4.5"/>
+        <text class="verb mid" x="935.0" y="74">quotes</text>
+        <path class="ln" d="M1095.0,196.0 L1095.0,360.0"/>
+        <line class="mk" x1="1095.0" y1="208.0" x2="1102.0" y2="196.0"/><line class="mk" x1="1095.0" y1="208.0" x2="1095.0" y2="196.0"/><line class="mk" x1="1095.0" y1="208.0" x2="1088.0" y2="196.0"/><circle class="ring" cx="1095.0" cy="215.0" r="4.5"/>
+        <line class="mk" x1="1089.0" y1="351.0" x2="1101.0" y2="351.0"/><line class="mk" x1="1089.0" y1="346.0" x2="1101.0" y2="346.0"/>
+        <text class="verb" x="1103.0" y="282">is a price for</text>
+        <path class="ln" d="M455.0,572.5 L455.0,650.0"/>
+        <line class="mk" x1="461.0" y1="581.5" x2="449.0" y2="581.5"/><circle class="ring" cx="455.0" cy="589.5" r="4.5"/>
+        <line class="mk" x1="455.0" y1="638.0" x2="448.0" y2="650.0"/><line class="mk" x1="455.0" y1="638.0" x2="455.0" y2="650.0"/><line class="mk" x1="455.0" y1="638.0" x2="462.0" y2="650.0"/><circle class="ring" cx="455.0" cy="631.0" r="4.5"/>
+        <text class="verb" x="463.0" y="616">browses in</text>
+        <path class="ln" d="M350.0,690.0 L240.0,690.0"/>
+        <line class="mk" x1="338.0" y1="690.0" x2="350.0" y2="697.0"/><line class="mk" x1="338.0" y1="690.0" x2="350.0" y2="690.0"/><line class="mk" x1="338.0" y1="690.0" x2="350.0" y2="683.0"/><circle class="ring" cx="331.0" cy="690.0" r="4.5"/>
+        <line class="mk" x1="249.0" y1="684.0" x2="249.0" y2="696.0"/><line class="mk" x1="254.0" y1="684.0" x2="254.0" y2="696.0"/>
+        <text class="verb mid" x="295.0" y="684">is from</text>
+        <path class="ln" d="M455.0,847.0 L455.0,930.0"/>
+        <line class="mk" x1="455.0" y1="859.0" x2="462.0" y2="847.0"/><line class="mk" x1="455.0" y1="859.0" x2="455.0" y2="847.0"/><line class="mk" x1="455.0" y1="859.0" x2="448.0" y2="847.0"/><circle class="ring" cx="455.0" cy="866.0" r="4.5"/>
+        <line class="mk" x1="449.0" y1="921.0" x2="461.0" y2="921.0"/><circle class="ring" cx="455.0" cy="913.0" r="4.5"/>
+        <text class="verb" x="463.0" y="892">uses</text>
+        <path class="ln" d="M135.0,723.0 L135.0,820.0"/>
+        <line class="mk" x1="141.0" y1="732.0" x2="129.0" y2="732.0"/><line class="mk" x1="141.0" y1="737.0" x2="129.0" y2="737.0"/>
+        <line class="mk" x1="135.0" y1="808.0" x2="128.0" y2="820.0"/><line class="mk" x1="135.0" y1="808.0" x2="135.0" y2="820.0"/><line class="mk" x1="135.0" y1="808.0" x2="142.0" y2="820.0"/><circle class="ring" cx="135.0" cy="801.0" r="4.5"/>
+        <text class="verb" x="143.0" y="776">is from</text>
+        <path class="ln" d="M240.0,975.0 L350.0,975.0"/>
+        <line class="mk" x1="252.0" y1="975.0" x2="240.0" y2="968.0"/><line class="mk" x1="252.0" y1="975.0" x2="240.0" y2="975.0"/><line class="mk" x1="252.0" y1="975.0" x2="240.0" y2="982.0"/><circle class="ring" cx="259.0" cy="975.0" r="4.5"/>
+        <line class="mk" x1="341.0" y1="981.0" x2="341.0" y2="969.0"/><circle class="ring" cx="333.0" cy="975.0" r="4.5"/>
+        <text class="verb mid" x="295.0" y="969">uses</text>
+        <path class="ln" d="M135.0,573.0 L135.0,650.0"/>
+        <line class="mk" x1="141.0" y1="582.0" x2="129.0" y2="582.0"/><circle class="ring" cx="135.0" cy="590.0" r="4.5"/>
+        <line class="mk" x1="135.0" y1="638.0" x2="128.0" y2="650.0"/><line class="mk" x1="135.0" y1="638.0" x2="135.0" y2="650.0"/><line class="mk" x1="135.0" y1="638.0" x2="142.0" y2="650.0"/><circle class="ring" cx="135.0" cy="631.0" r="4.5"/>
+        <text class="verb" x="143.0" y="616">is located by</text>
+        <path class="ln" d="M350.0,540.0 L310.0,540.0 L310.0,780.0 L200.0,780.0 L200.0,820.0"/>
+        <line class="mk" x1="341.0" y1="546.0" x2="341.0" y2="534.0"/><circle class="ring" cx="333.0" cy="540.0" r="4.5"/>
+        <line class="mk" x1="200.0" y1="808.0" x2="193.0" y2="820.0"/><line class="mk" x1="200.0" y1="808.0" x2="200.0" y2="820.0"/><line class="mk" x1="200.0" y1="808.0" x2="207.0" y2="820.0"/><circle class="ring" cx="200.0" cy="801.0" r="4.5"/>
+        <text class="verb mid" x="302.0" y="615" transform="rotate(-90 302 615)">makes</text>
+        <path class="ln dash" d="M350.0,840.0 L240.0,840.0"/>
+        <line class="mk" x1="341.0" y1="846.0" x2="341.0" y2="834.0"/><line class="mk" x1="336.0" y1="846.0" x2="336.0" y2="834.0"/>
+        <line class="mk" x1="252.0" y1="840.0" x2="240.0" y2="833.0"/><line class="mk" x1="252.0" y1="840.0" x2="240.0" y2="840.0"/><line class="mk" x1="252.0" y1="840.0" x2="240.0" y2="847.0"/><line class="mk" x1="257.0" y1="834.0" x2="257.0" y2="846.0"/>
+        <text class="verb mid" x="295.0" y="834">consists of</text>
+        <text class="verb mid" x="295.0" y="857">(derived)</text>
+        <g><rect class="body leads" x="30" y="30" width="210" height="383.0" rx="6"/><path class="head leads" d="M30,58 V36 Q30,30 36,30 H234 Q240,30 240,36 V58 Z"/><text class="name" x="42" y="49">Lead</text><text class="attr pk" x="42" y="70.0">lead_id</text><text class="tag" x="230" y="70.0">PK</text><line class="div leads" x1="30" y1="77.5" x2="240" y2="77.5"/><text class="attr" x="42" y="93.5">created_date</text><text class="attr" x="42" y="109.0">source</text><text class="attr" x="42" y="124.5">campaign_name</text><text class="attr" x="42" y="140.0">utm_source</text><text class="attr" x="42" y="155.5">utm_medium</text><text class="attr" x="42" y="171.0">utm_campaign</text><text class="attr" x="42" y="186.5">utm_content</text><text class="attr" x="42" y="202.0">country</text><text class="attr" x="42" y="217.5">city</text><text class="attr" x="42" y="233.0">company_name</text><text class="attr" x="42" y="248.5">company_size</text><text class="attr" x="42" y="264.0">industry</text><text class="attr" x="42" y="279.5">lead_score</text><text class="attr" x="42" y="295.0">estimated_order_volume</text><text class="attr" x="42" y="310.5">status</text><text class="attr" x="42" y="326.0">contact_name</text><text class="attr" x="42" y="341.5">contact_email</text><text class="attr" x="42" y="357.0">phone</text><text class="attr" x="42" y="372.5">job_title</text><text class="attr" x="42" y="388.0">sales_rep</text><text class="attr" x="42" y="403.5">last_contacted_date</text></g>
+        <g><rect class="body parties" x="350" y="30" width="210" height="259.0" rx="6"/><path class="head parties" d="M350,58 V36 Q350,30 356,30 H554 Q560,30 560,36 V58 Z"/><text class="name" x="362" y="49">Company</text><text class="attr pk" x="362" y="70.0">company_id</text><text class="tag" x="550" y="70.0">PK</text><line class="div parties" x1="350" y1="77.5" x2="560" y2="77.5"/><text class="attr" x="362" y="93.5">name</text><text class="attr" x="362" y="109.0">cuit</text><text class="attr" x="362" y="124.5">company_type</text><text class="attr" x="362" y="140.0">country</text><text class="attr" x="362" y="155.5">city</text><text class="attr" x="362" y="171.0">rating</text><text class="attr" x="362" y="186.5">address</text><text class="attr" x="362" y="202.0">phone</text><text class="attr" x="362" y="217.5">contact_email</text><text class="attr" x="362" y="233.0">industry</text><text class="attr" x="362" y="248.5">employee_count</text><text class="attr" x="362" y="264.0">payment_terms</text><text class="attr" x="362" y="279.5">is_active</text></g>
+        <g><rect class="body parties" x="670" y="30" width="210" height="150.5" rx="6"/><path class="head parties" d="M670,58 V36 Q670,30 676,30 H874 Q880,30 880,36 V58 Z"/><text class="name" x="682" y="49">Supplier</text><text class="attr pk" x="682" y="70.0">supplier_id</text><text class="tag" x="870" y="70.0">PK</text><line class="div parties" x1="670" y1="77.5" x2="880" y2="77.5"/><text class="attr" x="682" y="93.5">company_id</text><text class="tag" x="870" y="93.5">FK, AK</text><text class="attr" x="682" y="109.0">contact_name</text><text class="attr" x="682" y="124.5">contact_email</text><text class="attr" x="682" y="140.0">lead_time_days</text><text class="attr" x="682" y="155.5">min_order_value</text><text class="attr" x="682" y="171.0">is_preferred</text></g>
+        <g><rect class="body catalog" x="990" y="30" width="210" height="166.0" rx="6"/><path class="head catalog" d="M990,58 V36 Q990,30 996,30 H1194 Q1200,30 1200,36 V58 Z"/><text class="name" x="1002" y="49">Supplier Product</text><text class="attr pk" x="1002" y="70.0">supplier_id</text><text class="tag" x="1190" y="70.0">PK, FK</text><text class="attr pk" x="1002" y="85.5">product_id</text><text class="tag" x="1190" y="85.5">PK, FK</text><line class="div catalog" x1="990" y1="93.0" x2="1200" y2="93.0"/><text class="attr" x="1002" y="109.0">supplier_price</text><text class="attr" x="1002" y="124.5">supplier_sku</text><text class="attr" x="1002" y="140.0">min_order_qty</text><text class="attr" x="1002" y="155.5">lead_time_days</text><text class="attr" x="1002" y="171.0">is_preferred</text><text class="attr" x="1002" y="186.5">valid_from</text></g>
+        <g><rect class="body parties" x="350" y="360" width="210" height="212.5" rx="6"/><path class="head parties" d="M350,388 V366 Q350,360 356,360 H554 Q560,360 560,366 V388 Z"/><text class="name" x="362" y="379">Customer</text><text class="attr pk" x="362" y="400.0">customer_id</text><text class="tag" x="550" y="400.0">PK</text><line class="div parties" x1="350" y1="407.5" x2="560" y2="407.5"/><text class="attr" x="362" y="423.5">company_id</text><text class="tag" x="550" y="423.5">FK</text><text class="attr" x="362" y="439.0">email</text><text class="tag" x="550" y="439.0">AK</text><text class="attr" x="362" y="454.5">first_name</text><text class="attr" x="362" y="470.0">last_name</text><text class="attr" x="362" y="485.5">phone</text><text class="attr" x="362" y="501.0">job_title</text><text class="attr" x="362" y="516.5">gender</text><text class="attr" x="362" y="532.0">birth_date</text><text class="attr" x="362" y="547.5">document_number</text><text class="attr" x="362" y="563.0">is_active</text></g>
+        <g><rect class="body sales" x="670" y="360" width="210" height="228.0" rx="6"/><path class="head sales" d="M670,388 V366 Q670,360 676,360 H874 Q880,360 880,366 V388 Z"/><text class="name" x="682" y="379">Order</text><text class="attr pk" x="682" y="400.0">order_id</text><text class="tag" x="870" y="400.0">PK</text><line class="div sales" x1="670" y1="407.5" x2="880" y2="407.5"/><text class="attr" x="682" y="423.5">buyer_company_id</text><text class="tag" x="870" y="423.5">FK</text><text class="attr" x="682" y="439.0">customer_id</text><text class="tag" x="870" y="439.0">FK</text><text class="attr" x="682" y="454.5">order_date</text><text class="attr" x="682" y="470.0">order_date_valid</text><text class="attr" x="682" y="485.5">status</text><text class="attr" x="682" y="501.0">payment_method</text><text class="attr" x="682" y="516.5">shipping_method</text><text class="attr" x="682" y="532.0">shipping_cost</text><text class="attr" x="682" y="547.5">po_number</text><text class="attr" x="682" y="563.0">expected_delivery_date</text><text class="attr" x="682" y="578.5">channel</text></g>
+        <g><rect class="body catalog" x="990" y="360" width="210" height="212.5" rx="6"/><path class="head catalog" d="M990,388 V366 Q990,360 996,360 H1194 Q1200,360 1200,366 V388 Z"/><text class="name" x="1002" y="379">Product</text><text class="attr pk" x="1002" y="400.0">product_id</text><text class="tag" x="1190" y="400.0">PK</text><line class="div catalog" x1="990" y1="407.5" x2="1200" y2="407.5"/><text class="attr" x="1002" y="423.5">sku</text><text class="tag" x="1190" y="423.5">AK</text><text class="attr" x="1002" y="439.0">name</text><text class="attr" x="1002" y="454.5">category</text><text class="attr" x="1002" y="470.0">brand</text><text class="attr" x="1002" y="485.5">list_price</text><text class="attr" x="1002" y="501.0">unit_of_measure</text><text class="attr" x="1002" y="516.5">weight_kg</text><text class="attr" x="1002" y="532.0">barcode</text><text class="attr" x="1002" y="547.5">min_order_qty</text><text class="attr" x="1002" y="563.0">is_active</text></g>
+        <g><rect class="body sales" x="670" y="650" width="210" height="212.5" rx="6"/><path class="head sales" d="M670,678 V656 Q670,650 676,650 H874 Q880,650 880,656 V678 Z"/><text class="name" x="682" y="669">Order Item</text><text class="attr pk" x="682" y="690.0">order_item_id</text><text class="tag" x="870" y="690.0">PK</text><line class="div sales" x1="670" y1="697.5" x2="880" y2="697.5"/><text class="attr" x="682" y="713.5">order_id</text><text class="tag" x="870" y="713.5">FK, AK</text><text class="attr" x="682" y="729.0">line_number</text><text class="tag" x="870" y="729.0">AK</text><text class="attr" x="682" y="744.5">product_id</text><text class="tag" x="870" y="744.5">FK</text><text class="attr" x="682" y="760.0">supplier_id</text><text class="tag" x="870" y="760.0">FK</text><text class="attr" x="682" y="775.5">quantity</text><text class="attr" x="682" y="791.0">unit_price</text><text class="attr" x="682" y="806.5">discount_pct</text><text class="attr" x="682" y="822.0">tax_rate</text><text class="attr" x="682" y="837.5">line_total</text><text class="attr" x="682" y="853.0">warehouse</text></g>
+        <g><rect class="body web" x="30" y="500" width="210" height="73.0" rx="6"/><path class="head web" d="M30,528 V506 Q30,500 36,500 H234 Q240,500 240,506 V528 Z"/><text class="name" x="42" y="519">IP Geo Reference</text><text class="attr pk" x="42" y="540.0">first_octet</text><text class="tag" x="230" y="540.0">PK</text><line class="div web" x1="30" y1="547.5" x2="240" y2="547.5"/><text class="attr" x="42" y="563.5">country_code</text></g>
+        <g><rect class="body web" x="30" y="650" width="210" height="73.0" rx="6"/><path class="head web" d="M30,678 V656 Q30,650 36,650 H234 Q240,650 240,656 V678 Z"/><text class="name" x="42" y="669">IP Address</text><text class="attr pk" x="42" y="690.0">client_ip</text><text class="tag" x="230" y="690.0">PK</text><line class="div web" x1="30" y1="697.5" x2="240" y2="697.5"/><text class="attr" x="42" y="713.5">first_octet</text><text class="tag" x="230" y="713.5">FK</text></g>
+        <g><rect class="body web" x="30" y="820" width="210" height="228.0" rx="6"/><path class="head web" d="M30,848 V826 Q30,820 36,820 H234 Q240,820 240,826 V848 Z"/><text class="name" x="42" y="839">Page Request</text><text class="attr pk" x="42" y="860.0">log_id</text><text class="tag" x="230" y="860.0">PK</text><line class="div web" x1="30" y1="867.5" x2="240" y2="867.5"/><text class="attr" x="42" y="883.5">client_ip</text><text class="tag" x="230" y="883.5">FK</text><text class="attr" x="42" y="899.0">user_agent</text><text class="tag" x="230" y="899.0">FK</text><text class="attr" x="42" y="914.5">auth_user</text><text class="tag" x="230" y="914.5">FK</text><text class="attr" x="42" y="930.0">event_time</text><text class="attr" x="42" y="945.5">method</text><text class="attr" x="42" y="961.0">endpoint</text><text class="attr" x="42" y="976.5">query_string</text><text class="attr" x="42" y="992.0">protocol</text><text class="attr" x="42" y="1007.5">status_code</text><text class="attr" x="42" y="1023.0">response_bytes</text><text class="attr" x="42" y="1038.5">referer</text></g>
+        <g><rect class="body web" x="350" y="650" width="210" height="197.0" rx="6"/><path class="head web" d="M350,678 V656 Q350,650 356,650 H554 Q560,650 560,656 V678 Z"/><text class="name" x="362" y="669">Web Session</text><text class="attr pk" x="362" y="690.0">session_id</text><text class="tag" x="550" y="690.0">PK</text><line class="div web" x1="350" y1="697.5" x2="560" y2="697.5"/><text class="attr" x="362" y="713.5">customer_id</text><text class="tag" x="550" y="713.5">FK</text><text class="attr" x="362" y="729.0">client_ip</text><text class="tag" x="550" y="729.0">FK</text><text class="attr" x="362" y="744.5">user_agent</text><text class="tag" x="550" y="744.5">FK</text><text class="attr" x="362" y="760.0">session_start</text><text class="attr" x="362" y="775.5">session_end</text><text class="attr" x="362" y="791.0">duration_seconds</text><text class="attr" x="362" y="806.5">event_count</text><text class="attr" x="362" y="822.0">distinct_endpoints</text><text class="attr" x="362" y="837.5">entry_referer</text></g>
+        <g><rect class="body web" x="350" y="930" width="210" height="88.5" rx="6"/><path class="head web" d="M350,958 V936 Q350,930 356,930 H554 Q560,930 560,936 V958 Z"/><text class="name" x="362" y="949">Device</text><text class="attr pk" x="362" y="970.0">user_agent</text><text class="tag" x="550" y="970.0">PK</text><line class="div web" x1="350" y1="977.5" x2="560" y2="977.5"/><text class="attr" x="362" y="993.5">device_type</text><text class="attr" x="362" y="1009.0">is_bot</text></g>
+      </svg>
+    </div>
+    <figcaption>The symbol at a line end says how many of that entity connect to one of the entity at the other end. Supplier Product resolves the many-to-many link between Suppliers and Products, and its two foreign keys together form its primary key.</figcaption>
+  </figure>
+
+  <section>
+    <h2>Checked against the data</h2>
+    <ul class="notes">
+      <li>Every primary key and alternate key shown is unique across all rows, and no foreign key points at a missing row.</li>
+      <li>Every order has at least one item, and every supplier maps to its own company, which is why those ends read "one or many" and "zero or one".</li>
+      <li>A Web Session has a Customer for 29,630 of 110,848 sessions, and a Device is missing for 1,690 sessions and 9,698 page requests. Those links are drawn as optional.</li>
+      <li>A Page Request names its Customer through <code>auth_user</code>, which holds the customer's email. 214,131 of 538,152 requests have one, every one of them matches a Customer, and email is unique. The other 324,021 requests are anonymous.</li>
+      <li>Lead has no company key. It is tied to a Company only by matching <code>company_name</code> to the Company name, ignoring case. 144 of 1,098 leads match, so that line is dashed and zero or one.</li>
+      <li>An IP Address has no matching IP Geo Reference for 4,274 addresses and no first octet for 1,355, so that link is optional.</li>
+      <li><code>cuit</code> is shared by some companies (356 distinct values across 425), so it is not a key.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Choices in this version</h2>
+    <ul class="notes">
+      <li>Web Sessions and Page Requests have no key between them, so that line is dashed. The catalog builds each session from page requests with the same IP address and device, split after 30 minutes of inactivity.</li>
+      <li>Lead repeats some company details (name, industry, country, city) because a lead can exist before any Company record. Order Item <code>line_total</code> and Web Session <code>duration_seconds</code> are shown as stored, though both could be calculated.</li>
+      <li>Left out because they are storage detail that belongs in the physical model: surrogate keys, <code>created_at</code> and <code>updated_at</code> timestamps, <code>source_file</code> and version validity columns. The gold PDM leaves the timestamps out too, by the catalog's own policy.</li>
+      <li>Attribute names are the catalog's own. Rename them to business terms once the definitions are agreed.</li>
+    </ul>
+  </section>
+</div>
+
+</body></html>

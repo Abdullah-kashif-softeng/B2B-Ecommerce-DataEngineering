@@ -1,0 +1,183 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>B2B Ecommerce PDM</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a wide, scrollable star-schema diagram (facts in the middle, dimensions around them), a key above it, storage facts and review notes below. */
+:root {
+  --bg: #f7f8fa; --fg: #1c2330; --muted: #5b6678; --line: #6b7587; --rule: #dde1e8; --surface: #ffffff;
+  --c-fact: #2457c5; --c-dim: #0f766e; --c-bridge: #b45309;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-head: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --fg: #e6e9ef; --muted: #98a2b3; --line: #8a94a6; --rule: #2a313c; --surface: #181d26;
+    --c-fact: #7aa2ff; --c-dim: #4fd1c5; --c-bridge: #f5b25c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --fg: #e6e9ef; --muted: #98a2b3; --line: #8a94a6; --rule: #2a313c; --surface: #181d26;
+  --c-fact: #7aa2ff; --c-dim: #4fd1c5; --c-bridge: #f5b25c;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-block: 32px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1720px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+h1 { font-family: var(--font-head); font-weight: 600; font-size: 1.9rem; line-height: 1.15; margin: 0 0 8px; text-wrap: balance; }
+h2 { font-family: var(--font-head); font-weight: 500; font-size: 1.1rem; margin: 0 0 8px; }
+p { margin: 0; max-width: 72ch; }
+.lede { color: var(--muted); }
+code { font-family: var(--font-mono); font-size: 12.5px; }
+.keys { display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--muted); }
+.group { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; }
+.group b { font-weight: 500; color: var(--fg); min-width: 96px; }
+.group span { display: inline-flex; align-items: center; gap: 7px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid; }
+.sw.fact { border-color: var(--c-fact); background: color-mix(in srgb, var(--c-fact) 18%, transparent); }
+.sw.dim { border-color: var(--c-dim); background: color-mix(in srgb, var(--c-dim) 18%, transparent); }
+.sw.bridge { border-color: var(--c-bridge); background: color-mix(in srgb, var(--c-bridge) 18%, transparent); }
+.kt { font-family: var(--font-mono); font-weight: 700; font-size: 11px; color: var(--fg); }
+svg.key { min-width: 0; width: 46px; height: 12px; color: var(--fg); }
+figure { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 12px; }
+svg.pdm { display: block; min-width: 1500px; width: 100%; height: auto; color: var(--fg); }
+figcaption { font-size: 13px; color: var(--muted); max-width: 90ch; }
+svg text { font-family: var(--font-body); fill: currentColor; stroke: none; }
+.body { fill: var(--surface); stroke-width: 1.6; }
+.head { stroke: none; fill-opacity: 0.2; }
+.fact { fill: var(--c-fact); stroke: var(--c-fact); }
+.dim { fill: var(--c-dim); stroke: var(--c-dim); }
+.bridge, .ref { fill: var(--c-bridge); stroke: var(--c-bridge); }
+.body.fact, .body.dim, .body.bridge, .body.ref { fill: var(--surface); }
+.name { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+.sub { font-family: var(--font-mono); font-size: 10px; fill: var(--muted); }
+.col { font-size: 11.5px; }
+.typ { font-family: var(--font-mono); font-size: 10px; fill: var(--muted); text-anchor: end; }
+.tg { font-family: var(--font-mono); font-size: 9.5px; font-weight: 700; fill: var(--muted); }
+.tg.pk { fill: var(--fg); }
+.ln { fill: none; stroke: var(--line); stroke-width: 1.3; }
+.ln.opt { stroke-dasharray: 5 3; }
+.arrow { fill: var(--line); }
+.notes { display: flex; flex-direction: column; gap: 8px; padding-left: 18px; margin: 0; max-width: 84ch; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); max-width: 640px; }
+table { border-collapse: collapse; width: 100%; min-width: 440px; font-size: 13.5px; }
+th, td { text-align: left; padding: 8px 14px; border-bottom: 1px solid var(--rule); }
+th { font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>B2B Ecommerce physical data model</h1>
+    <p class="lede">The gold layer of <code>b2b_ecommerce</code> as it is built in Databricks: 13 Delta tables with their real column types, key columns, clustering and partitioning. Bronze and silver are not drawn.</p>
+  </header>
+
+  <div class="keys" aria-label="Notation key">
+    <div class="group"><b>Table kind</b>
+      <span><i class="sw fact"></i>Fact</span>
+      <span><i class="sw dim"></i>Dimension</span>
+      <span><i class="sw bridge"></i>Bridge or reference</span>
+    </div>
+    <div class="group"><b>Column tag</b>
+      <span><span class="kt">PK</span>declared primary key</span>
+      <span><span class="kt">LK</span>logical key: unique in the data, but no constraint declared</span>
+      <span><span class="kt">FK</span>join column to another table, no constraint declared</span>
+    </div>
+    <div class="group"><b>Join line</b>
+      <span><svg class="key" viewBox="0 0 46 12" aria-hidden="true"><line class="ln" x1="0" y1="6" x2="40" y2="6"/><path d="M36,2.5 L44,6 L36,9.5 z" class="arrow"/></svg>every row has a value</span>
+      <span><svg class="key" viewBox="0 0 46 12" aria-hidden="true"><line class="ln opt" x1="0" y1="6" x2="40" y2="6"/><path d="M36,2.5 L44,6 L36,9.5 z" class="arrow"/></svg>empty for some rows</span>
+      <span>The arrow points at the parent column. Hover a line to see the join.</span>
+    </div>
+  </div>
+
+  <figure>
+    <div class="scroll">
+      <svg class="pdm" viewBox="0 0 1650 889" role="img" aria-label="Physical data model of the 13 gold-layer Delta tables in b2b_ecommerce. Four fact tables (order items, leads, web logs, web sessions) join to dimension tables through surrogate keys, and to device and IP geography by user agent and client IP. A supplier-product bridge links suppliers and products. IP geography maps to a reference table whose first_octet is the only declared primary key. Each box lists column names, types and key roles, plus clustering or partitioning.">
+        <defs><marker id="ah" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0.5 L8,4 L0,7.5 z" class="arrow"/></marker></defs>
+        <path class="ln" d="M30.00,500.75 L22.00,500.75 L22.00,89.75 L30.00,89.75" marker-end="url(#ah)"><title>dim_suppliers.company_id -> dim_companies.company_id</title></path>
+        <path class="ln" d="M30.00,649.75 L12.00,649.75 L12.00,485.25 L30.00,485.25" marker-end="url(#ah)"><title>bridge.supplier_id -> dim_suppliers.supplier_id</title></path>
+        <path class="ln opt" d="M362.00,136.25 L296.00,136.25 L296.00,306.75 L284.00,306.75" marker-end="url(#ah)"><title>fact_leads.company_sk -> dim_companies.company_sk</title></path>
+        <path class="ln" d="M362.00,492.75 L308.00,492.75 L308.00,306.75 L284.00,306.75" marker-end="url(#ah)"><title>fact_order_items.company_sk -> dim_companies.company_sk</title></path>
+        <path class="ln" d="M362.00,523.75 L320.00,523.75 L320.00,469.75 L284.00,469.75" marker-end="url(#ah)"><title>fact_order_items.supplier_sk -> dim_suppliers.supplier_sk</title></path>
+        <path class="ln" d="M694.00,430.75 L664.00,430.75 L664.00,298.00 L332.00,298.00 L332.00,89.75 L284.00,89.75" marker-end="url(#ah)"><title>dim_customers.company_id -> dim_companies.company_id</title></path>
+        <path class="ln" d="M284.00,665.25 L344.00,665.25 L344.00,735.25 L362.00,735.25" marker-end="url(#ah)"><title>bridge.product_id -> dim_products.product_id</title></path>
+        <path class="ln" d="M616.00,105.25 L628.00,105.25 L628.00,89.75 L694.00,89.75" marker-end="url(#ah)"><title>fact_leads.date_sk -> dim_date.date_sk</title></path>
+        <path class="ln opt" d="M616.00,430.75 L640.00,430.75 L640.00,89.75 L694.00,89.75" marker-end="url(#ah)"><title>fact_order_items.date_sk -> dim_date.date_sk</title></path>
+        <path class="ln" d="M616.00,477.25 L652.00,477.25 L652.00,399.75 L694.00,399.75" marker-end="url(#ah)"><title>fact_order_items.customer_sk -> dim_customers.customer_sk</title></path>
+        <path class="ln" d="M616.00,508.25 L676.00,508.25 L676.00,719.75 L616.00,719.75" marker-end="url(#ah)"><title>fact_order_items.product_sk -> dim_products.product_sk</title></path>
+        <path class="ln" d="M1026.00,105.25 L960.00,105.25 L960.00,89.75 L948.00,89.75" marker-end="url(#ah)"><title>fact_web_logs.date_sk -> dim_date.date_sk</title></path>
+        <path class="ln" d="M1026.00,415.25 L972.00,415.25 L972.00,89.75 L948.00,89.75" marker-end="url(#ah)"><title>fact_web_sessions.date_sk -> dim_date.date_sk</title></path>
+        <path class="ln opt" d="M1026.00,136.25 L984.00,136.25 L984.00,399.75 L948.00,399.75" marker-end="url(#ah)"><title>fact_web_logs.customer_sk -> dim_customers.customer_sk</title></path>
+        <path class="ln opt" d="M1026.00,461.75 L996.00,461.75 L996.00,399.75 L948.00,399.75" marker-end="url(#ah)"><title>fact_web_sessions.customer_sk -> dim_customers.customer_sk</title></path>
+        <path class="ln opt" d="M1280.00,167.25 L1292.00,167.25 L1292.00,105.25 L1358.00,105.25" marker-end="url(#ah)"><title>fact_web_logs.user_agent -> dim_device.user_agent</title></path>
+        <path class="ln" d="M1280.00,151.75 L1304.00,151.75 L1304.00,415.25 L1358.00,415.25" marker-end="url(#ah)"><title>fact_web_logs.client_ip -> dim_ip_geo.client_ip</title></path>
+        <path class="ln opt" d="M1280.00,446.25 L1316.00,446.25 L1316.00,105.25 L1358.00,105.25" marker-end="url(#ah)"><title>fact_web_sessions.user_agent -> dim_device.user_agent</title></path>
+        <path class="ln" d="M1280.00,430.75 L1328.00,430.75 L1328.00,415.25 L1358.00,415.25" marker-end="url(#ah)"><title>fact_web_sessions.client_ip -> dim_ip_geo.client_ip</title></path>
+        <path class="ln opt" d="M1612.00,430.75 L1630.00,430.75 L1630.00,589.75 L1612.00,589.75" marker-end="url(#ah)"><title>dim_ip_geo.first_octet -> ref_ip_geo.first_octet</title></path>
+        <g><rect class="body dim" x="30" y="30" width="254" height="323.5" rx="6"/><path class="head dim" d="M30,82 V36 Q30,30 36,30 H278 Q284,30 284,36 V82 Z"/><text class="name" x="40" y="49">dim_companies</text><text class="sub" x="40" y="63">dimension · SCD2 · 425 rows</text><text class="sub" x="40" y="75">cluster by company_sk</text><text class="tg lk" x="38" y="93.5">LK</text><text class="col" x="64" y="93.5">company_id</text><text class="typ" x="276" y="93.5">int</text><text class="col" x="64" y="109.0">name</text><text class="typ" x="276" y="109.0">string</text><text class="col" x="64" y="124.5">cuit</text><text class="typ" x="276" y="124.5">string</text><text class="col" x="64" y="140.0">company_type</text><text class="typ" x="276" y="140.0">string</text><text class="col" x="64" y="155.5">country</text><text class="typ" x="276" y="155.5">string</text><text class="col" x="64" y="171.0">city</text><text class="typ" x="276" y="171.0">string</text><text class="col" x="64" y="186.5">rating</text><text class="typ" x="276" y="186.5">decimal(2,1)</text><text class="col" x="64" y="202.0">address</text><text class="typ" x="276" y="202.0">string</text><text class="col" x="64" y="217.5">phone</text><text class="typ" x="276" y="217.5">string</text><text class="col" x="64" y="233.0">contact_email</text><text class="typ" x="276" y="233.0">string</text><text class="col" x="64" y="248.5">industry</text><text class="typ" x="276" y="248.5">string</text><text class="col" x="64" y="264.0">employee_count</text><text class="typ" x="276" y="264.0">int</text><text class="col" x="64" y="279.5">payment_terms</text><text class="typ" x="276" y="279.5">string</text><text class="col" x="64" y="295.0">is_active</text><text class="typ" x="276" y="295.0">boolean</text><text class="tg lk" x="38" y="310.5">LK</text><text class="col" x="64" y="310.5">company_sk</text><text class="typ" x="276" y="310.5">bigint</text><text class="tg lk" x="38" y="326.0">LK</text><text class="col" x="64" y="326.0">__START_AT</text><text class="typ" x="276" y="326.0">timestamp</text><text class="col" x="64" y="341.5">__END_AT</text><text class="typ" x="276" y="341.5">timestamp</text></g>
+        <g><rect class="body dim" x="30" y="410" width="254" height="106.5" rx="6"/><path class="head dim" d="M30,462 V416 Q30,410 36,410 H278 Q284,410 284,416 V462 Z"/><text class="name" x="40" y="429">dim_suppliers</text><text class="sub" x="40" y="443">dimension · SCD1 · 25 rows</text><text class="sub" x="40" y="455">cluster by supplier_sk</text><text class="tg lk" x="38" y="473.5">LK</text><text class="col" x="64" y="473.5">supplier_sk</text><text class="typ" x="276" y="473.5">bigint</text><text class="tg lk" x="38" y="489.0">LK</text><text class="col" x="64" y="489.0">supplier_id</text><text class="typ" x="276" y="489.0">int</text><text class="tg fk" x="38" y="504.5">FK</text><text class="col" x="64" y="504.5">company_id</text><text class="typ" x="276" y="504.5">int</text></g>
+        <g><rect class="body bridge" x="30" y="590" width="254" height="137.5" rx="6"/><path class="head bridge" d="M30,642 V596 Q30,590 36,590 H278 Q284,590 284,596 V642 Z"/><text class="name" x="40" y="609">bridge_supplier_products</text><text class="sub" x="40" y="623">bridge · SCD2 · 313 rows</text><text class="sub" x="40" y="635">cluster by supplier_id, product_id</text><text class="tg lk" x="38" y="653.5">LK</text><text class="col" x="64" y="653.5">supplier_id</text><text class="typ" x="276" y="653.5">int</text><text class="tg lk" x="38" y="669.0">LK</text><text class="col" x="64" y="669.0">product_id</text><text class="typ" x="276" y="669.0">int</text><text class="col" x="64" y="684.5">supplier_price</text><text class="typ" x="276" y="684.5">decimal(10,2)</text><text class="col" x="64" y="700.0">__START_AT</text><text class="typ" x="276" y="700.0">timestamp</text><text class="col" x="64" y="715.5">__END_AT</text><text class="typ" x="276" y="715.5">timestamp</text></g>
+        <g><rect class="body fact" x="362" y="30" width="254" height="246.0" rx="6"/><path class="head fact" d="M362,82 V36 Q362,30 368,30 H610 Q616,30 616,36 V82 Z"/><text class="name" x="372" y="49">fact_leads</text><text class="sub" x="372" y="63">transaction fact · 1,098 rows</text><text class="sub" x="372" y="75">partition by date_sk · 562 files</text><text class="tg lk" x="370" y="93.5">LK</text><text class="col" x="396" y="93.5">lead_id</text><text class="typ" x="608" y="93.5">string</text><text class="tg fk" x="370" y="109.0">FK</text><text class="col" x="396" y="109.0">date_sk</text><text class="typ" x="608" y="109.0">int</text><text class="col" x="396" y="124.5">created_date</text><text class="typ" x="608" y="124.5">date</text><text class="tg fk" x="370" y="140.0">FK</text><text class="col" x="396" y="140.0">company_sk</text><text class="typ" x="608" y="140.0">bigint</text><text class="col" x="396" y="155.5">source</text><text class="typ" x="608" y="155.5">string</text><text class="col" x="396" y="171.0">campaign_name</text><text class="typ" x="608" y="171.0">string</text><text class="col" x="396" y="186.5">utm_source</text><text class="typ" x="608" y="186.5">string</text><text class="col" x="396" y="202.0">utm_medium</text><text class="typ" x="608" y="202.0">string</text><text class="col" x="396" y="217.5">utm_campaign</text><text class="typ" x="608" y="217.5">string</text><text class="col" x="396" y="233.0">status</text><text class="typ" x="608" y="233.0">string</text><text class="col" x="396" y="248.5">lead_score</text><text class="typ" x="608" y="248.5">int</text><text class="col" x="396" y="264.0">estimated_order_volume</text><text class="typ" x="608" y="264.0">decimal(12,2)</text></g>
+        <g><rect class="body fact" x="362" y="340" width="254" height="292.5" rx="6"/><path class="head fact" d="M362,392 V346 Q362,340 368,340 H610 Q616,340 616,346 V392 Z"/><text class="name" x="372" y="359">fact_order_items</text><text class="sub" x="372" y="373">transaction fact · 31,442 rows</text><text class="sub" x="372" y="385">partition by date_sk · 747 files</text><text class="tg lk" x="370" y="403.5">LK</text><text class="col" x="396" y="403.5">order_item_id</text><text class="typ" x="608" y="403.5">bigint</text><text class="col" x="396" y="419.0">order_id</text><text class="typ" x="608" y="419.0">bigint</text><text class="tg fk" x="370" y="434.5">FK</text><text class="col" x="396" y="434.5">date_sk</text><text class="typ" x="608" y="434.5">int</text><text class="col" x="396" y="450.0">order_date</text><text class="typ" x="608" y="450.0">date</text><text class="col" x="396" y="465.5">order_date_valid</text><text class="typ" x="608" y="465.5">boolean</text><text class="tg fk" x="370" y="481.0">FK</text><text class="col" x="396" y="481.0">customer_sk</text><text class="typ" x="608" y="481.0">bigint</text><text class="tg fk" x="370" y="496.5">FK</text><text class="col" x="396" y="496.5">company_sk</text><text class="typ" x="608" y="496.5">bigint</text><text class="tg fk" x="370" y="512.0">FK</text><text class="col" x="396" y="512.0">product_sk</text><text class="typ" x="608" y="512.0">bigint</text><text class="tg fk" x="370" y="527.5">FK</text><text class="col" x="396" y="527.5">supplier_sk</text><text class="typ" x="608" y="527.5">bigint</text><text class="col" x="396" y="543.0">order_created_at</text><text class="typ" x="608" y="543.0">timestamp</text><text class="col" x="396" y="558.5">status</text><text class="typ" x="608" y="558.5">string</text><text class="col" x="396" y="574.0">channel</text><text class="typ" x="608" y="574.0">string</text><text class="col" x="396" y="589.5">quantity</text><text class="typ" x="608" y="589.5">int</text><text class="col" x="396" y="605.0">unit_price</text><text class="typ" x="608" y="605.0">decimal(10,2)</text><text class="col" x="396" y="620.5">line_total</text><text class="typ" x="608" y="620.5">decimal(12,2)</text></g>
+        <g><rect class="body dim" x="362" y="660" width="254" height="199.5" rx="6"/><path class="head dim" d="M362,712 V666 Q362,660 368,660 H610 Q616,660 616,666 V712 Z"/><text class="name" x="372" y="679">dim_products</text><text class="sub" x="372" y="693">dimension · SCD2 · 160 rows</text><text class="sub" x="372" y="705">cluster by product_sk</text><text class="tg lk" x="370" y="723.5">LK</text><text class="col" x="396" y="723.5">product_sk</text><text class="typ" x="608" y="723.5">bigint</text><text class="tg lk" x="370" y="739.0">LK</text><text class="col" x="396" y="739.0">product_id</text><text class="typ" x="608" y="739.0">int</text><text class="col" x="396" y="754.5">sku</text><text class="typ" x="608" y="754.5">string</text><text class="col" x="396" y="770.0">name</text><text class="typ" x="608" y="770.0">string</text><text class="col" x="396" y="785.5">category</text><text class="typ" x="608" y="785.5">string</text><text class="col" x="396" y="801.0">list_price</text><text class="typ" x="608" y="801.0">decimal(10,2)</text><text class="col" x="396" y="816.5">is_active</text><text class="typ" x="608" y="816.5">boolean</text><text class="tg lk" x="370" y="832.0">LK</text><text class="col" x="396" y="832.0">__START_AT</text><text class="typ" x="608" y="832.0">timestamp</text><text class="col" x="396" y="847.5">__END_AT</text><text class="typ" x="608" y="847.5">timestamp</text></g>
+        <g><rect class="body dim" x="694" y="30" width="254" height="137.5" rx="6"/><path class="head dim" d="M694,82 V36 Q694,30 700,30 H942 Q948,30 948,36 V82 Z"/><text class="name" x="704" y="49">dim_date</text><text class="sub" x="704" y="63">dimension · calendar · 752 rows</text><text class="sub" x="704" y="75">cluster by date_sk</text><text class="tg lk" x="702" y="93.5">LK</text><text class="col" x="728" y="93.5">date_sk</text><text class="typ" x="940" y="93.5">int</text><text class="col" x="728" y="109.0">full_date</text><text class="typ" x="940" y="109.0">date</text><text class="col" x="728" y="124.5">calendar_year</text><text class="typ" x="940" y="124.5">int</text><text class="col" x="728" y="140.0">calendar_month</text><text class="typ" x="940" y="140.0">int</text><text class="col" x="728" y="155.5">year_month</text><text class="typ" x="940" y="155.5">int</text></g>
+        <g><rect class="body dim" x="694" y="340" width="254" height="168.5" rx="6"/><path class="head dim" d="M694,392 V346 Q694,340 700,340 H942 Q948,340 948,346 V392 Z"/><text class="name" x="704" y="359">dim_customers</text><text class="sub" x="704" y="373">dimension · SCD1 · 1,592 rows</text><text class="sub" x="704" y="385">cluster by customer_sk</text><text class="tg lk" x="702" y="403.5">LK</text><text class="col" x="728" y="403.5">customer_sk</text><text class="typ" x="940" y="403.5">bigint</text><text class="tg lk" x="702" y="419.0">LK</text><text class="col" x="728" y="419.0">customer_id</text><text class="typ" x="940" y="419.0">int</text><text class="tg fk" x="702" y="434.5">FK</text><text class="col" x="728" y="434.5">company_id</text><text class="typ" x="940" y="434.5">int</text><text class="col" x="728" y="450.0">email</text><text class="typ" x="940" y="450.0">string</text><text class="col" x="728" y="465.5">gender</text><text class="typ" x="940" y="465.5">string</text><text class="col" x="728" y="481.0">birth_date</text><text class="typ" x="940" y="481.0">date</text><text class="col" x="728" y="496.5">is_active</text><text class="typ" x="940" y="496.5">boolean</text></g>
+        <g><rect class="body fact" x="1026" y="30" width="254" height="215.0" rx="6"/><path class="head fact" d="M1026,82 V36 Q1026,30 1032,30 H1274 Q1280,30 1280,36 V82 Z"/><text class="name" x="1036" y="49">fact_web_logs</text><text class="sub" x="1036" y="63">transaction fact · 538,152 rows</text><text class="sub" x="1036" y="75">partition by date_sk · 739 files</text><text class="tg lk" x="1034" y="93.5">LK</text><text class="col" x="1060" y="93.5">log_id</text><text class="typ" x="1272" y="93.5">string</text><text class="tg fk" x="1034" y="109.0">FK</text><text class="col" x="1060" y="109.0">date_sk</text><text class="typ" x="1272" y="109.0">int</text><text class="col" x="1060" y="124.5">event_time</text><text class="typ" x="1272" y="124.5">timestamp</text><text class="tg fk" x="1034" y="140.0">FK</text><text class="col" x="1060" y="140.0">customer_sk</text><text class="typ" x="1272" y="140.0">bigint</text><text class="tg fk" x="1034" y="155.5">FK</text><text class="col" x="1060" y="155.5">client_ip</text><text class="typ" x="1272" y="155.5">string</text><text class="tg fk" x="1034" y="171.0">FK</text><text class="col" x="1060" y="171.0">user_agent</text><text class="typ" x="1272" y="171.0">string</text><text class="col" x="1060" y="186.5">method</text><text class="typ" x="1272" y="186.5">string</text><text class="col" x="1060" y="202.0">endpoint</text><text class="typ" x="1272" y="202.0">string</text><text class="col" x="1060" y="217.5">status_code</text><text class="typ" x="1272" y="217.5">int</text><text class="col" x="1060" y="233.0">referer</text><text class="typ" x="1272" y="233.0">string</text></g>
+        <g><rect class="body fact" x="1026" y="340" width="254" height="230.5" rx="6"/><path class="head fact" d="M1026,392 V346 Q1026,340 1032,340 H1274 Q1280,340 1280,346 V392 Z"/><text class="name" x="1036" y="359">fact_web_sessions</text><text class="sub" x="1036" y="373">periodic fact · 110,848 rows</text><text class="sub" x="1036" y="385">partition by date_sk · 739 files</text><text class="tg lk" x="1034" y="403.5">LK</text><text class="col" x="1060" y="403.5">session_id</text><text class="typ" x="1272" y="403.5">bigint</text><text class="tg fk" x="1034" y="419.0">FK</text><text class="col" x="1060" y="419.0">date_sk</text><text class="typ" x="1272" y="419.0">int</text><text class="tg fk" x="1034" y="434.5">FK</text><text class="col" x="1060" y="434.5">client_ip</text><text class="typ" x="1272" y="434.5">string</text><text class="tg fk" x="1034" y="450.0">FK</text><text class="col" x="1060" y="450.0">user_agent</text><text class="typ" x="1272" y="450.0">string</text><text class="tg fk" x="1034" y="465.5">FK</text><text class="col" x="1060" y="465.5">customer_sk</text><text class="typ" x="1272" y="465.5">bigint</text><text class="col" x="1060" y="481.0">session_start</text><text class="typ" x="1272" y="481.0">timestamp</text><text class="col" x="1060" y="496.5">session_end</text><text class="typ" x="1272" y="496.5">timestamp</text><text class="col" x="1060" y="512.0">duration_seconds</text><text class="typ" x="1272" y="512.0">int</text><text class="col" x="1060" y="527.5">event_count</text><text class="typ" x="1272" y="527.5">bigint</text><text class="col" x="1060" y="543.0">distinct_endpoints</text><text class="typ" x="1272" y="543.0">bigint</text><text class="col" x="1060" y="558.5">entry_referer</text><text class="typ" x="1272" y="558.5">string</text></g>
+        <g><rect class="body dim" x="1358" y="30" width="254" height="122.0" rx="6"/><path class="head dim" d="M1358,82 V36 Q1358,30 1364,30 H1606 Q1612,30 1612,36 V82 Z"/><text class="name" x="1368" y="49">dim_device</text><text class="sub" x="1368" y="63">dimension · SCD1 · 204 rows</text><text class="sub" x="1368" y="75">cluster by device_sk</text><text class="tg lk" x="1366" y="93.5">LK</text><text class="col" x="1392" y="93.5">device_sk</text><text class="typ" x="1604" y="93.5">bigint</text><text class="tg lk" x="1366" y="109.0">LK</text><text class="col" x="1392" y="109.0">user_agent</text><text class="typ" x="1604" y="109.0">string</text><text class="col" x="1392" y="124.5">device_type</text><text class="typ" x="1604" y="124.5">string</text><text class="col" x="1392" y="140.0">is_bot</text><text class="typ" x="1604" y="140.0">boolean</text></g>
+        <g><rect class="body dim" x="1358" y="340" width="254" height="122.0" rx="6"/><path class="head dim" d="M1358,392 V346 Q1358,340 1364,340 H1606 Q1612,340 1612,346 V392 Z"/><text class="name" x="1368" y="359">dim_ip_geo</text><text class="sub" x="1368" y="373">dimension · SCD1 · 75,809 rows</text><text class="sub" x="1368" y="385">cluster by ip_sk</text><text class="tg lk" x="1366" y="403.5">LK</text><text class="col" x="1392" y="403.5">ip_sk</text><text class="typ" x="1604" y="403.5">bigint</text><text class="tg lk" x="1366" y="419.0">LK</text><text class="col" x="1392" y="419.0">client_ip</text><text class="typ" x="1604" y="419.0">string</text><text class="tg fk" x="1366" y="434.5">FK</text><text class="col" x="1392" y="434.5">first_octet</text><text class="typ" x="1604" y="434.5">int</text><text class="col" x="1392" y="450.0">country_code</text><text class="typ" x="1604" y="450.0">string</text></g>
+        <g><rect class="body ref" x="1358" y="530" width="254" height="91.0" rx="6"/><path class="head ref" d="M1358,582 V536 Q1358,530 1364,530 H1606 Q1612,530 1612,536 V582 Z"/><text class="name" x="1368" y="549">ref_ip_geo</text><text class="sub" x="1368" y="563">reference · managed table · 21 rows</text><text class="sub" x="1368" y="575">no clustering or partitioning</text><text class="tg pk" x="1366" y="593.5">PK</text><text class="col" x="1392" y="593.5">first_octet</text><text class="typ" x="1604" y="593.5">int not null</text><text class="col" x="1392" y="609.0">country_code</text><text class="typ" x="1604" y="609.0">string not null</text></g>
+      </svg>
+    </div>
+    <figcaption>Each join runs from the column that holds the key in the child table to the key it matches in the parent. Dimensions are clustered on their surrogate key and facts are partitioned by day on <code>date_sk</code>. All columns allow nulls except the two in <code>ref_ip_geo</code>.</figcaption>
+  </figure>
+
+  <section>
+    <h2>What the catalog declares and what is inferred</h2>
+    <ul class="notes">
+      <li>The only declared constraint is <code>pk_ref_ip_geo</code> on <code>ref_ip_geo.first_octet</code>. Every other key and join is inferred from column names and checked against the data.</li>
+      <li>Each logical key is unique across all rows (for the bridge, <code>supplier_id</code> and <code>product_id</code> together), and no join has an orphan row. The exception is <code>dim_ip_geo.first_octet</code>: 4,274 addresses carry an octet that is not in the 21-row reference, and 1,355 have none.</li>
+      <li>Where Databricks does accept primary and foreign key constraints, it records them as metadata and does not check writes against them.</li>
+      <li>Facts carry <code>client_ip</code> and <code>user_agent</code> as text and join to <code>dim_ip_geo</code> and <code>dim_device</code> on those, so <code>ip_sk</code> and <code>device_sk</code> are not used by any join.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>How it is stored</h2>
+    <ul class="notes">
+      <li>All 13 tables are Delta. The 12 built by the pipeline are streaming tables with zstd compression, deletion vectors, row tracking and change data feed turned on. <code>ref_ip_geo</code> is a plain managed table.</li>
+      <li>Table types and the slowly changing dimension type (SCD1 or SCD2) come from the table comments in the catalog.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Worth a look</h2>
+    <ul class="notes">
+      <li><b>Many tiny files.</b> Partitioning each fact by day gives hundreds of small files for a few megabytes of data.</li>
+    </ul>
+    <div class="tablewrap" style="margin-top: 10px;">
+      <table>
+        <thead><tr><th>Fact table</th><th class="n">Size</th><th class="n">Files</th><th class="n">Average file</th></tr></thead>
+        <tbody>
+          <tr><td><code>fact_order_items</code></td><td class="n">4.2 MB</td><td class="n">747</td><td class="n">5.6 KB</td></tr>
+          <tr><td><code>fact_leads</code></td><td class="n">2.0 MB</td><td class="n">562</td><td class="n">3.6 KB</td></tr>
+          <tr><td><code>fact_web_logs</code></td><td class="n">29.2 MB</td><td class="n">739</td><td class="n">39.5 KB</td></tr>
+          <tr><td><code>fact_web_sessions</code></td><td class="n">6.9 MB</td><td class="n">739</td><td class="n">9.3 KB</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="notes" style="margin-top: 10px;">
+      <li><b>Joins to versioned dimensions.</b> <code>dim_companies</code> and <code>dim_products</code> keep one row per version. Today each business key has one row, so joins on <code>company_id</code> or <code>product_id</code> are safe. Once a version changes they return two rows unless filtered to <code>__END_AT IS NULL</code>. This affects the joins from <code>dim_customers</code>, <code>dim_suppliers</code> and the bridge.</li>
+    </ul>
+  </section>
+</div>
+
+</body></html>
